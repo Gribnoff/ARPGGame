@@ -10,18 +10,18 @@ import com.badlogic.gdx.math.Vector2;
 public class GameScreen extends AbstractScreen {
     private Map map;
     private Hero hero;
-    private Monster monster;
     private InfoController infoController;
+    private MonsterController monsterController;
     private BitmapFont font24;
     private Vector2 mouse;
     private Vector2 tmp;
 
-    public Monster getMonster() {
-        return monster;
-    }
-
     public InfoController getInfoController() {
         return infoController;
+    }
+
+    public MonsterController getMonsterController() {
+        return monsterController;
     }
 
     public Map getMap() {
@@ -40,9 +40,11 @@ public class GameScreen extends AbstractScreen {
     public void show() {
         this.map = new Map();
         this.hero = new Hero(this);
-        this.monster = new Monster(this);
         this.font24 = Assets.getInstance().getAssetManager().get("fonts/font24.ttf");
         this.infoController = new InfoController();
+        this.monsterController = new MonsterController();
+        monsterController.setup(1);
+        monsterController.setup(2);
         this.mouse = new Vector2(0.0f, 0.0f);
         this.tmp = new Vector2(0.0f, 0.0f);
     }
@@ -62,9 +64,7 @@ public class GameScreen extends AbstractScreen {
         if (hero.isActive()) {
             hero.render(batch);
         }
-        if (monster.isActive()) {
-            monster.render(batch);
-        }
+        monsterController.render(batch);
         infoController.render(batch, font24);
         batch.end();
     }
@@ -75,9 +75,7 @@ public class GameScreen extends AbstractScreen {
         if (hero.isActive()) {
             hero.update(dt);
         }
-        if (monster.isActive()) {
-            monster.update(dt);
-        }
+        monsterController.update(dt);
         infoController.update(dt);
     }
 

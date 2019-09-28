@@ -50,7 +50,6 @@ public abstract class Unit {
         gs.getInfoController().setup(position.x, position.y + 30, "-" + amount, color);
     }
 
-    public abstract void render(SpriteBatch batch);
 
     public abstract void update(float dt);
 }

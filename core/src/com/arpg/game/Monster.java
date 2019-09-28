@@ -1,5 +1,6 @@
 package com.arpg.game;
 
+import com.arpg.game.utils.Poolable;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -10,8 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 
-public class Monster extends Unit {
-    private TextureRegion hpTexture;
+public class Monster extends Unit implements Poolable {
     private float aiTimer;
     private float aiTimerTo;
 
@@ -19,32 +19,23 @@ public class Monster extends Unit {
         return hp > 0;
     }
 
+    public void setup(int level) {
+        this.aiTimerTo = 0.0f;
+        this.level = level;
+        this.hpMax = 10 + 5 * level;
+        this.hp = hpMax;
+        this.speed = 120.0f + 5 * level;
+        this.weapon = new Weapon("Short Dark Sword", 0.8f, 2, 5);
+    }
+
     public Monster(GameScreen gameScreen) {
         super(gameScreen);
-        this.hpTexture = Assets.getInstance().getAtlas().findRegion("monsterHp");
         this.texture = Assets.getInstance().getAtlas().findRegion("Skeleton");
         do {
             this.position.set(MathUtils.random(0, Map.MAP_SIZE_X_PX), MathUtils.random(0, Map.MAP_SIZE_Y_PX));
         } while (!gameScreen.getMap().isCellPassable(position));
         this.area.setPosition(position);
-        this.speed = 120.0f;
         this.aiTimerTo = 0.0f;
-        this.hpMax = 10;
-        this.hp = hpMax;
-        this.weapon = new Weapon("Short Dark Sword", 0.8f, 2, 5);
-    }
-
-    @Override
-    public void render(SpriteBatch batch) {
-        if (damageTimer > 0.0f) {
-            batch.setColor(1.0f, 1.0f - damageTimer, 1.0f - damageTimer, 1.0f);
-        }
-        batch.draw(texture, position.x - 40, position.y - 40);
-        if (hp < hpMax) {
-            batch.setColor(1.0f, 1.0f, 1.0f, 0.9f);
-            batch.draw(hpTexture, position.x - 40, position.y + 40, 80 * ((float) hp / hpMax), 12);
-        }
-        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     @Override

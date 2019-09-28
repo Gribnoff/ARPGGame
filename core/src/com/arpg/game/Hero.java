@@ -30,7 +30,6 @@ public class Hero extends Unit {
         this.weapon = new Weapon("Short Sword", 0.5f, 1, 3);
     }
 
-    @Override
     public void render(SpriteBatch batch) {
         if (damageTimer > 0.0f) {
             batch.setColor(1.0f, 1.0f - damageTimer, 1.0f - damageTimer, 1.0f);
@@ -93,8 +92,10 @@ public class Hero extends Unit {
         if (attackTime > weapon.getAttackPeriod()) {
             attackTime = 0.0f;
             tmp.set(position).add(direction.getX() * 60, direction.getY() * 60);
-            if (gs.getMonster().getArea().contains(tmp)) {
-                gs.getMonster().takeDamage(weapon.getDamage(), Color.WHITE);
+            for (Monster monster : gs.getMonsterController().getActiveList()) {
+                if (monster.getArea().contains(tmp)) {
+                    monster.takeDamage(weapon.getDamage(), Color.WHITE);
+                }
             }
         }
     }
