@@ -79,7 +79,7 @@ public class Hero extends Unit {
             for (int i = 0; i < gs.getMonsterController().getActiveList().size(); i++) {
                 Monster m = gs.getMonsterController().getActiveList().get(i);
                 if (m.getArea().contains(tmp)) {
-                    m.takeDamage(weapon.getDamage(), Color.WHITE);
+                    m.takeDamage(weapon.getDamage() + this.stats.getAtt(), Color.WHITE);
                     break;
                 }
             }

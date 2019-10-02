@@ -37,6 +37,14 @@ public class Stats {
         return hpMax;
     }
 
+    public int getAtt() {
+        return att;
+    }
+
+    public int getDef() {
+        return def;
+    }
+
     public Stats() {
     }
 

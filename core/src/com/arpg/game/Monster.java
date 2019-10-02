@@ -91,7 +91,7 @@ public class Monster extends Unit implements Poolable {
             tmp.set(position).add(direction.getX() * 60, direction.getY() * 60);
             if (gs.getHero().getArea().contains(tmp)) {
                 gs.getEffectController().setup(tmp.x, tmp.y, 1);
-                gs.getHero().takeDamage(weapon.getDamage(), Color.RED);
+                gs.getHero().takeDamage(weapon.getDamage() + this.stats.getAtt(), Color.RED);
             }
         }
     }

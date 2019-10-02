@@ -45,12 +45,16 @@ public abstract class Unit {
     }
 
     public void takeDamage(int amount, Color color) {
-        stats.decreaseHp(amount);
-        damageTimer = 1.0f;
-        gs.getInfoController().setup(position.x, position.y + 30, "-" + amount, color);
+        int takenDamage = amount - this.stats.getDef();
+        if (takenDamage > 0) {
+            stats.decreaseHp(takenDamage);
+            damageTimer = 1.0f;
+            gs.getInfoController().setup(position.x, position.y + 30, "-" + takenDamage, color);
+        } else
+            gs.getInfoController().setup(position.x, position.y + 30, "block", color);
     }
 
-    public void render(SpriteBatch batch, BitmapFont font) {
+    public void render(SpriteBatch batch, BitmapFont fontLvl, BitmapFont fontHP) {
         if (damageTimer > 0.0f) {
             batch.setColor(1.0f, 1.0f - damageTimer, 1.0f - damageTimer, 1.0f);
         }
@@ -60,7 +64,8 @@ public abstract class Unit {
             batch.draw(hpTexture, position.x - 40, position.y + 40, 80 * ((float) stats.getHp() / stats.getHpMax()), 12);
         }
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        font.draw(batch, "" + stats.getLevel(), position.x, position.y + 50);
+        fontLvl.draw(batch, "" + stats.getLevel(), position.x, position.y - 40);
+        fontHP.draw(batch, String.format("%d/%d", stats.getHp(), stats.getHpMax()), position.x - 40, position.y + 50);
     }
 
     public abstract void update(float dt);

@@ -15,6 +15,7 @@ public class GameScreen extends AbstractScreen {
     private InfoController infoController;
     private EffectController effectController;
     private BitmapFont font24;
+    private BitmapFont font12;
     private Vector2 mouse;
     private Vector2 tmp;
     private float spawnTimer;
@@ -57,6 +58,7 @@ public class GameScreen extends AbstractScreen {
             this.monsterController.setup(1);
         }
         this.font24 = Assets.getInstance().getAssetManager().get("fonts/font24.ttf");
+        this.font12 = Assets.getInstance().getAssetManager().get("fonts/font12.ttf");
         this.infoController = new InfoController();
         this.effectController = new EffectController();
         this.mouse = new Vector2(0.0f, 0.0f);
@@ -76,9 +78,9 @@ public class GameScreen extends AbstractScreen {
         batch.begin();
         map.render(batch);
         if (hero.isActive()) {
-            hero.render(batch, font24);
+            hero.render(batch, font24, font12);
         }
-        monsterController.render(batch, font24);
+        monsterController.render(batch, font24, font12);
         effectController.render(batch);
         infoController.render(batch, font24);
         batch.end();

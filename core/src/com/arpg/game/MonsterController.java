@@ -18,9 +18,9 @@ public class MonsterController extends ObjectPool<Monster> {
         this.gs = gs;
     }
 
-    public void render(SpriteBatch batch, BitmapFont font) {
+    public void render(SpriteBatch batch, BitmapFont fontLvl, BitmapFont fontHP) {
         for (int i = 0; i < activeList.size(); i++) {
-            activeList.get(i).render(batch, font);
+            activeList.get(i).render(batch, fontLvl, fontHP);
         }
     }
 
