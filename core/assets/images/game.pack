@@ -3,37 +3,51 @@ images1.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-Wall
+wanim
   rotate: false
   xy: 2, 2
+  size: 360, 120
+  orig: 360, 120
+  offset: 0, 0
+  index: -1
+Wall
+  rotate: false
+  xy: 364, 2
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 Skeleton
   rotate: false
-  xy: 84, 2
+  xy: 446, 2
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+Reaper
+  rotate: false
+  xy: 528, 2
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 Knight
   rotate: false
-  xy: 166, 2
+  xy: 610, 2
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 Grass
   rotate: false
-  xy: 248, 2
+  xy: 692, 2
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 monsterHp
   rotate: false
-  xy: 2, 84
+  xy: 364, 84
   size: 60, 8
   orig: 60, 8
   offset: 0, 0

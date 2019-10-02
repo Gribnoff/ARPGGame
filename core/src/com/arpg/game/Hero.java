@@ -10,36 +10,19 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 public class Hero extends Unit {
-    private TextureRegion hpTexture;
-
     public boolean isActive() {
-        return hp > 0;
+        return stats.getHp() > 0;
     }
 
     public Hero(GameScreen gameScreen) {
         super(gameScreen);
-        this.hpTexture = Assets.getInstance().getAtlas().findRegion("monsterHp");
         this.texture = Assets.getInstance().getAtlas().findRegion("Knight");
         do {
             this.position.set(MathUtils.random(0, Map.MAP_SIZE_X_PX), MathUtils.random(0, Map.MAP_SIZE_Y_PX));
         } while (!gameScreen.getMap().isCellPassable(position));
         this.area.setPosition(position);
-        this.speed = 320.0f;
-        this.hpMax = 50;
-        this.hp = hpMax;
+        this.stats = new Stats(1, 1, 1, 20, 1, 1, 10, 320.0f);
         this.weapon = new Weapon("Short Sword", 0.5f, 1, 3);
-    }
-
-    public void render(SpriteBatch batch) {
-        if (damageTimer > 0.0f) {
-            batch.setColor(1.0f, 1.0f - damageTimer, 1.0f - damageTimer, 1.0f);
-        }
-        batch.draw(texture, position.x - 40, position.y - 40);
-        if (hp < hpMax) {
-            batch.setColor(1.0f, 1.0f, 1.0f, 0.9f);
-            batch.draw(hpTexture, position.x - 40, position.y + 40, 80 * ((float) hp / hpMax), 12);
-        }
-        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     @Override
@@ -72,7 +55,7 @@ public class Hero extends Unit {
 
         if (btnPressed) {
             tmp.set(position);
-            tmp.add(direction.getX() * speed * speedMod * dt, direction.getY() * speed * speedMod * dt);
+            tmp.add(direction.getX() * stats.getSpeed() * speedMod * dt, direction.getY() * stats.getSpeed() * speedMod * dt);
             if (gs.getMap().isCellPassable(tmp)) {
                 position.set(tmp);
                 area.setPosition(position);
@@ -92,9 +75,12 @@ public class Hero extends Unit {
         if (attackTime > weapon.getAttackPeriod()) {
             attackTime = 0.0f;
             tmp.set(position).add(direction.getX() * 60, direction.getY() * 60);
-            for (Monster monster : gs.getMonsterController().getActiveList()) {
-                if (monster.getArea().contains(tmp)) {
-                    monster.takeDamage(weapon.getDamage(), Color.WHITE);
+            gs.getEffectController().setup(tmp.x, tmp.y, 0);
+            for (int i = 0; i < gs.getMonsterController().getActiveList().size(); i++) {
+                Monster m = gs.getMonsterController().getActiveList().get(i);
+                if (m.getArea().contains(tmp)) {
+                    m.takeDamage(weapon.getDamage(), Color.WHITE);
+                    break;
                 }
             }
         }

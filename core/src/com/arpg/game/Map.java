@@ -36,6 +36,12 @@ public class Map {
         }
     }
 
+    public void setRefVectorToEmptyPoint(Vector2 refInput) {
+        do {
+            refInput.set(MathUtils.random(0, Map.MAP_SIZE_X_PX), MathUtils.random(0, Map.MAP_SIZE_Y_PX));
+        } while (!isCellPassable(refInput));
+    }
+
     public void render(SpriteBatch batch) {
         for (int i = 0; i < MAP_SIZE_X; i++) {
             for (int j = 0; j < MAP_SIZE_Y; j++) {

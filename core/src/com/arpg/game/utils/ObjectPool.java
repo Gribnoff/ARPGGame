@@ -22,14 +22,6 @@ public abstract class ObjectPool<T extends Poolable> {
         this.freeList = new ArrayList<T>();
     }
 
-    public ObjectPool(int size) {
-        this.activeList = new ArrayList<T>();
-        this.freeList = new ArrayList<T>();
-        for (int i = 0; i < size; i++) {
-            freeList.add(newObject());
-        }
-    }
-
     public T getActiveElement() {
         if (freeList.size() == 0) {
             freeList.add(newObject());

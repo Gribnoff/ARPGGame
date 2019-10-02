@@ -30,10 +30,6 @@ public class ScreenManager {
         return ourInstance;
     }
 
-    public GameScreen getGameScreen() {
-        return gameScreen;
-    }
-
     public Viewport getViewport() {
         return viewport;
     }
