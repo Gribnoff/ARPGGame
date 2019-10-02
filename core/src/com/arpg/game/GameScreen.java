@@ -88,7 +88,7 @@ public class GameScreen extends AbstractScreen {
         spawnTimer += dt;
         if (spawnTimer > 1.0f) {
             spawnTimer = 0.0f;
-            monsterController.setup(1);
+            monsterController.setup(hero.stats.getLevel());
         }
         mouse.set(Gdx.input.getX(), Gdx.input.getY());
         ScreenManager.getInstance().getViewport().unproject(mouse);
