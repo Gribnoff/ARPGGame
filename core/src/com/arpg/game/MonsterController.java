@@ -27,7 +27,10 @@ public class MonsterController extends ObjectPool<Monster> {
     public void setup(int level) {
         int currentLevel = MathUtils.random(level, level + 2);
         String[] patterns = {"Skeleton", "Reaper"};
-        getActiveElement().setup(currentLevel, -1, -1, gs.getBestiary().getPatternFromTitle(patterns[MathUtils.random(0, 1)]));
+        Monster pattern = (MathUtils.random() < 0.9) ?
+                gs.getBestiary().getPatternFromTitle(patterns[0]) :
+                gs.getBestiary().getPatternFromTitle(patterns[1]);
+        getActiveElement().setup(currentLevel, -1, -1, pattern);
     }
 
     public void update(float dt) {
