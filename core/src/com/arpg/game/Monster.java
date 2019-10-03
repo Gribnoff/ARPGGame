@@ -1,15 +1,8 @@
 package com.arpg.game;
 
 import com.arpg.game.utils.Poolable;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Shape2D;
-import com.badlogic.gdx.math.Vector2;
 
 public class Monster extends Unit implements Poolable {
     private String title;
@@ -31,7 +24,7 @@ public class Monster extends Unit implements Poolable {
         this.weapon = new Weapon("Short Dark Sword", 0.8f, 2, 5);
     }
 
-    // ___title________,__base_att__,__base_def__,__base_hp__,__att_pl__,__def_pl__,__hp_pl__,__speed__
+    // ___title________,__base_att__,__base_def__,__base_hp__,__att_pl__,__def_pl__,__hp_pl__,__speed__,__gained_exp__
     public Monster(String line) {
         super(null);
         String[] tokens = line.split(",");
@@ -45,7 +38,8 @@ public class Monster extends Unit implements Poolable {
                 Integer.parseInt(tokens[4].trim()),
                 Integer.parseInt(tokens[5].trim()),
                 Integer.parseInt(tokens[6].trim()),
-                Float.parseFloat(tokens[7].trim())
+                Float.parseFloat(tokens[7].trim()),
+                Integer.parseInt(tokens[8].trim())
         );
         this.weapon = new Weapon("Short Dark Sword", 0.8f, 2, 5);
     }

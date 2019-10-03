@@ -1,14 +1,13 @@
 package com.arpg.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class ArpgGame extends Game {
 	private SpriteBatch batch;
+	private SpriteBatch hudBatch;
 
 	// Домашнее задание:
 	// Вероятность появления скелета - 90%, жнеца - 10% (можно добавить зависимость от уроня героя)
@@ -19,7 +18,8 @@ public class ArpgGame extends Game {
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		ScreenManager.getInstance().init(this, batch);
+		hudBatch = new SpriteBatch();
+		ScreenManager.getInstance().init(this, batch, hudBatch);
 		ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
 	}
 

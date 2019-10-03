@@ -3,11 +3,7 @@ package com.arpg.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 
 public class Hero extends Unit {
     public boolean isActive() {
@@ -21,7 +17,7 @@ public class Hero extends Unit {
             this.position.set(MathUtils.random(0, Map.MAP_SIZE_X_PX), MathUtils.random(0, Map.MAP_SIZE_Y_PX));
         } while (!gameScreen.getMap().isCellPassable(position));
         this.area.setPosition(position);
-        this.stats = new Stats(1, 1, 1, 20, 1, 1, 10, 320.0f);
+        this.stats = new Stats(1, 1, 1, 20, 1, 1, 10, 320.0f, 0);
         this.weapon = new Weapon("Short Sword", 0.5f, 1, 3);
     }
 
@@ -79,7 +75,16 @@ public class Hero extends Unit {
             for (int i = 0; i < gs.getMonsterController().getActiveList().size(); i++) {
                 Monster m = gs.getMonsterController().getActiveList().get(i);
                 if (m.getArea().contains(tmp)) {
-                    m.takeDamage(weapon.getDamage() + this.stats.getAtt(), Color.WHITE);
+                    m.takeDamage(weapon.getDamage() + stats.getAtt(), Color.WHITE);
+                    if (!m.isActive()) {
+                        int lvlDiff = m.stats.getLevel() - stats.getLevel();
+                        if (lvlDiff < 5) {
+                            int gainedExp = (int) (m.stats.getGainedExp() * (1 + lvlDiff * 0.2f));
+                            stats.addExp(gainedExp);
+                            if (stats.getExp() == 0)
+                                gs.getInfoController().setup(position.x, position.y, "Level up!", Color.GOLD);
+                        }
+                    }
                     break;
                 }
             }

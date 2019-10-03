@@ -18,6 +18,7 @@ public class ScreenManager {
 
     private ArpgGame game;
     private SpriteBatch batch;
+    private SpriteBatch hudBatch;
     private LoadingScreen loadingScreen;
     private GameScreen gameScreen;
     private Screen targetScreen;
@@ -41,12 +42,13 @@ public class ScreenManager {
     private ScreenManager() {
     }
 
-    public void init(ArpgGame game, SpriteBatch batch) {
+    public void init(ArpgGame game, SpriteBatch batch, SpriteBatch hudBatch) {
         this.game = game;
         this.batch = batch;
+        this.hudBatch = hudBatch;
         this.camera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT);
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
-        this.gameScreen = new GameScreen(batch);
+        this.gameScreen = new GameScreen(batch, hudBatch);
         this.loadingScreen = new LoadingScreen(batch);
     }
 

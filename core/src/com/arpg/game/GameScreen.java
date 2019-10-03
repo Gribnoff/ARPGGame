@@ -1,19 +1,20 @@
 package com.arpg.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 public class GameScreen extends AbstractScreen {
+    private SpriteBatch hudBatch;
     private Map map;
     private Hero hero;
     private Bestiary bestiary;
     private MonsterController monsterController;
     private InfoController infoController;
     private EffectController effectController;
+    private HUD hud;
     private BitmapFont font24;
     private BitmapFont font12;
     private Vector2 mouse;
@@ -40,12 +41,21 @@ public class GameScreen extends AbstractScreen {
         return map;
     }
 
-    public GameScreen(SpriteBatch batch) {
+    public GameScreen(SpriteBatch batch, SpriteBatch hudBatch) {
         super(batch);
+        this.hudBatch = hudBatch;
     }
 
     public Hero getHero() {
         return hero;
+    }
+
+    public BitmapFont getFont24() {
+        return font24;
+    }
+
+    public SpriteBatch getHUDBatch() {
+        return hudBatch;
     }
 
     @Override
@@ -61,6 +71,7 @@ public class GameScreen extends AbstractScreen {
         this.font12 = Assets.getInstance().getAssetManager().get("fonts/font12.ttf");
         this.infoController = new InfoController();
         this.effectController = new EffectController();
+        this.hud = new HUD(this);
         this.mouse = new Vector2(0.0f, 0.0f);
         this.tmp = new Vector2(0.0f, 0.0f);
     }
@@ -84,11 +95,15 @@ public class GameScreen extends AbstractScreen {
         effectController.render(batch);
         infoController.render(batch, font24);
         batch.end();
+
+        hudBatch.begin();
+        hud.render();
+        hudBatch.end();
     }
 
     public void update(float dt) {
         spawnTimer += dt;
-        if (spawnTimer > 1.0f) {
+        if (spawnTimer > 15.0f) {
             spawnTimer = 0.0f;
             monsterController.setup(hero.stats.getLevel());
         }
@@ -100,5 +115,6 @@ public class GameScreen extends AbstractScreen {
         monsterController.update(dt);
         effectController.update(dt);
         infoController.update(dt);
+        hud.update();
     }
 }
