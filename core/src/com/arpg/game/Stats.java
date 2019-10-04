@@ -19,8 +19,15 @@ public class Stats {
 
     private int hp;
     private int exp;
-    private int gainedExp;
-    private int[] expTo = {1000, 2000, 4000, 8000, 16000, 32000};
+    private int[] expTo = {1_000, 2_000, 4_000, 8_000, 16_000, 32_000, 80_000, 150_000, 200_000, 400_000};
+
+    public int getAtt() {
+        return att;
+    }
+
+    public int getDef() {
+        return def;
+    }
 
     public int getLevel() {
         return level;
@@ -38,30 +45,10 @@ public class Stats {
         return hpMax;
     }
 
-    public int getAtt() {
-        return att;
-    }
-
-    public int getDef() {
-        return def;
-    }
-
-    public int getExp() {
-        return exp;
-    }
-
-    public int getExpTo(int currentLvl) {
-        return expTo[currentLvl - 1];
-    }
-
-    public int getGainedExp() {
-        return gainedExp;
-    }
-
     public Stats() {
     }
 
-    public Stats(int level, int attBase, int defBase, int hpMaxBase, int attPL, int defPL, int hpMaxPL, float speed, int gainedExp) {
+    public Stats(int level, int attBase, int defBase, int hpMaxBase, int attPL, int defPL, int hpMaxPL, float speed) {
         this.level = level;
         this.attBase = attBase;
         this.defBase = defBase;
@@ -70,7 +57,6 @@ public class Stats {
         this.defPL = defPL;
         this.hpMaxPL = hpMaxPL;
         this.speed = speed;
-        this.gainedExp = gainedExp;
         this.calculate();
         this.fillHp();
     }
@@ -84,7 +70,6 @@ public class Stats {
         this.defPL = stats.defPL;
         this.hpMaxPL = stats.hpMaxPL;
         this.speed = stats.speed;
-        this.gainedExp = stats.gainedExp;
         this.calculate();
         this.fillHp();
     }
@@ -111,10 +96,5 @@ public class Stats {
         att = attBase + level * attPL;
         def = defBase + level * defPL;
         hpMax = hpMaxBase + level * hpMaxPL;
-    }
-
-    public void levelUp() {
-        level++;
-        calculate();
     }
 }

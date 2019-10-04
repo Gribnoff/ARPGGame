@@ -4,6 +4,7 @@ import com.arpg.game.utils.ObjectPool;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 public class MonsterController extends ObjectPool<Monster> {
     private GameScreen gs;
@@ -17,19 +18,15 @@ public class MonsterController extends ObjectPool<Monster> {
         this.gs = gs;
     }
 
-    public void render(SpriteBatch batch, BitmapFont fontLvl, BitmapFont fontHP) {
+    public void render(SpriteBatch batch, BitmapFont font) {
         for (int i = 0; i < activeList.size(); i++) {
-            activeList.get(i).render(batch, fontLvl, fontHP);
+            activeList.get(i).render(batch, font);
         }
     }
 
     public void setup(int level) {
         int currentLevel = MathUtils.random(level, level + 2);
-        String[] patterns = {"Skeleton", "Reaper"};
-        Monster pattern = (MathUtils.random() < 0.9) ?
-                gs.getBestiary().getPatternFromTitle(patterns[0]) :
-                gs.getBestiary().getPatternFromTitle(patterns[1]);
-        getActiveElement().setup(currentLevel, -1, -1, pattern);
+        getActiveElement().setup(currentLevel, -1, -1, gs.getBestiary().getPatternFromTitle("Tiger"));
     }
 
     public void update(float dt) {

@@ -1,5 +1,6 @@
 package com.arpg.game;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -11,20 +12,20 @@ public class Map {
     }
 
     public static final int CELL_SIZE = 80;
-    public static final int MAP_SIZE_X = 20;
+    public static final int MAP_SIZE_X = 24;
     public static final int MAP_SIZE_X_PX = MAP_SIZE_X * CELL_SIZE;
-    public static final int MAP_SIZE_Y = 10;
+    public static final int MAP_SIZE_Y = 14;
     public static final int MAP_SIZE_Y_PX = MAP_SIZE_Y * CELL_SIZE;
 
     private BlockType[][] data;
-    private TextureRegion textureWall;
+    private TextureRegion[] textureWall;
     private TextureRegion textureGrass;
 
     public Map() {
         this.data = new BlockType[MAP_SIZE_X][MAP_SIZE_Y];
 
         this.textureGrass = Assets.getInstance().getAtlas().findRegion("Grass");
-        this.textureWall = Assets.getInstance().getAtlas().findRegion("Wall");
+        this.textureWall = new TextureRegion(Assets.getInstance().getAtlas().findRegion("trees")).split(80, 120)[0];
         for (int i = 0; i < MAP_SIZE_X; i++) {
             for (int j = 0; j < MAP_SIZE_Y; j++) {
                 data[i][j] = BlockType.EMPTY;
@@ -41,12 +42,22 @@ public class Map {
         } while (!isCellPassable(refInput));
     }
 
+    public void renderGround(SpriteBatch batch, int x, int y) {
+        batch.draw(textureGrass, x * 80, y * 80);
+    }
+
+    public void renderWalls(SpriteBatch batch, int x, int y) {
+        if (data[x][y] == BlockType.WALL) {
+            batch.draw(textureWall[0], x * 80, y * 80);
+        }
+    }
+
     public void render(SpriteBatch batch) {
         for (int i = 0; i < MAP_SIZE_X; i++) {
-            for (int j = 0; j < MAP_SIZE_Y; j++) {
+            for (int j = MAP_SIZE_Y - 1; j >= 0; j--) {
                 batch.draw(textureGrass, i * 80, j * 80);
                 if (data[i][j] == BlockType.WALL) {
-                    batch.draw(textureWall, i * 80 , j * 80 );
+                    batch.draw(textureWall[1], i * 80, j * 80);
                 }
             }
         }
