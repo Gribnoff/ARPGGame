@@ -111,7 +111,7 @@ public class GameScreen extends AbstractScreen {
         btnToMenu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.exit();
+                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
             }
         });
 
