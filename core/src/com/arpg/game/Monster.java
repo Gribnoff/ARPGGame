@@ -15,6 +15,10 @@ public class Monster extends Unit implements Poolable {
     private String title;
     private float aiTimer;
     private float aiTimerTo;
+    private float aggrTimer;
+    private float aggrTimerTo;
+    private float aggrDirectionTimer;
+    private float aggrDirectionTimerTo;
 
     public String getTitle() {
         return title;
@@ -60,6 +64,8 @@ public class Monster extends Unit implements Poolable {
             this.position.set(x, y);
         }
         this.area.setPosition(position);
+        this.aggrTimerTo = 20.f;
+        this.aggrDirectionTimerTo = 0.2f;
     }
 
     @Override
@@ -71,7 +77,19 @@ public class Monster extends Unit implements Poolable {
             damageTimer -= dt;
         }
 
-        if (aiTimer > aiTimerTo) {
+        if (aggressive) {
+            aggrTimer += dt;
+            if (aggrTimer > aggrTimerTo) {
+                aggrTimer = 0.f;
+                aggressive = false;
+            }
+
+            aggrDirectionTimer += dt;
+            if (aggrDirectionTimer > aggrDirectionTimerTo) {
+                aggrDirectionTimer = 0.f;
+                direction = changeDirection();
+            }
+        } else if (aiTimer > aiTimerTo) {
             aiTimer = 0.0f;
             aiTimerTo = MathUtils.random(2.0f, 4.0f);
             direction = Direction.values()[MathUtils.random(0, 3)];
@@ -87,6 +105,22 @@ public class Monster extends Unit implements Poolable {
         tryToAttack();
     }
 
+    private Direction changeDirection() {
+        Direction direction;
+        tmp.set(gs.getHero().getPosition());
+        float angle = tmp.sub(this.getPosition()).angle();
+        if (angle >= 45 && angle < 135)
+            direction = Direction.UP;
+        else if (angle >= 135 && angle < 225)
+            direction = Direction.LEFT;
+        else if (angle >= 225 && angle < 315)
+            direction = Direction.DOWN;
+        else
+            direction = Direction.RIGHT;
+
+        return direction;
+    }
+
     public void tryToAttack() {
         if (attackTime > weapon.getAttackPeriod()) {
             attackTime = 0.0f;
@@ -96,5 +130,13 @@ public class Monster extends Unit implements Poolable {
                 gs.getHero().takeDamage(this, BattleCalc.calculateDamage(this, gs.getHero()), Color.RED);
             }
         }
+    }
+
+    public boolean isAggressive() {
+        return aggressive;
+    }
+
+    public void setAggressive() {
+        this.aggressive = true;
     }
 }
