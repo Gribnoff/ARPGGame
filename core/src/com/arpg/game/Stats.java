@@ -82,6 +82,15 @@ public class Stats {
         hp = hpMax;
     }
 
+    public int restoreHp(int amount) {
+        int hp0 = hp;
+        hp += amount;
+        if (hp > hpMax) {
+            hp = hpMax;
+        }
+        return hp - hp0;
+    }
+
     public void addExp(int amount) {
         exp += amount;
         if (exp >= expTo[level - 1]) {

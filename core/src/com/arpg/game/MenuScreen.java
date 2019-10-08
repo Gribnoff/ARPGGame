@@ -1,6 +1,7 @@
 package com.arpg.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -19,10 +20,7 @@ public class MenuScreen extends AbstractScreen {
         super(batch);
     }
 
-    @Override
-    public void show() {
-        this.font24 = Assets.getInstance().getAssetManager().get("fonts/font24.ttf");
-        this.stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
+    private void init(){
         Gdx.input.setInputProcessor(stage);
         Skin skin = new Skin();
         skin.addRegions(Assets.getInstance().getAtlas());
@@ -31,39 +29,46 @@ public class MenuScreen extends AbstractScreen {
         textButtonStyle.font = font24;
         skin.add("smallButtonStyle", textButtonStyle);
 
-        Button btnNewGame = new TextButton("New game", skin, "smallButtonStyle");
-        Button btnExit = new TextButton("Exit", skin, "smallButtonStyle");
+        Button newGameButton = new TextButton("New Game", skin, "smallButtonStyle");
+        Button exitButton = new TextButton("Exit Game", skin, "smallButtonStyle");
         Group menuGroup = new Group();
-        menuGroup.addActor(btnNewGame);
-        menuGroup.addActor(btnExit);
-        btnNewGame.setPosition(0, 50);
-        btnExit.setPosition(10, 0);
+        menuGroup.addActor(newGameButton);
+        menuGroup.addActor(exitButton);
+        newGameButton.setPosition(0, 50);
+        exitButton.setPosition(0, 0);
+        menuGroup.setPosition(500, 400);
+        stage.addActor(menuGroup);
+        skin.dispose();
 
-        btnNewGame.addListener(new ChangeListener() {
+        newGameButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
             }
         });
 
-        btnExit.addListener(new ChangeListener() {
+        exitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.exit();
             }
         });
+    }
 
-        menuGroup.setPosition(550, 350);
-        stage.addActor(menuGroup);
-
-        skin.dispose();
+    @Override
+    public void show() {
+        this.stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
+        this.font24 = Assets.getInstance().getAssetManager().get("fonts/font24.ttf");
+        init();
+        ScreenManager.getInstance().getCamera().position.set(ScreenManager.HALF_WORLD_WIDTH, ScreenManager.HALF_WORLD_HEIGHT, 0);
+        ScreenManager.getInstance().getCamera().update();
+        batch.setProjectionMatrix(ScreenManager.getInstance().getCamera().combined);
     }
 
     @Override
     public void render(float delta) {
-        ScreenManager.getInstance().getCamera().position.set(ScreenManager.HALF_WORLD_WIDTH, ScreenManager.HALF_WORLD_HEIGHT, 0);
-        ScreenManager.getInstance().getCamera().update();
-        batch.setProjectionMatrix(ScreenManager.getInstance().getCamera().combined);
+        Gdx.gl.glClearColor(0, 0, 0.5f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
     }
 }

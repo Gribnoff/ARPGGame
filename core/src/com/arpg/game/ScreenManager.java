@@ -47,8 +47,8 @@ public class ScreenManager {
         this.batch = batch;
         this.camera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT);
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
-        this.menuScreen = new MenuScreen(batch);
         this.gameScreen = new GameScreen(batch);
+        this.menuScreen = new MenuScreen(batch);
         this.loadingScreen = new LoadingScreen(batch);
     }
 
@@ -72,13 +72,13 @@ public class ScreenManager {
         resetCamera();
         game.setScreen(loadingScreen);
         switch (type) {
-            case MENU:
-                targetScreen = menuScreen;
-                Assets.getInstance().loadAssets(ScreenType.MENU);
-                break;
             case GAME:
                 targetScreen = gameScreen;
                 Assets.getInstance().loadAssets(ScreenType.GAME);
+                break;
+            case MENU:
+                targetScreen = menuScreen;
+                Assets.getInstance().loadAssets(ScreenType.MENU);
                 break;
         }
     }

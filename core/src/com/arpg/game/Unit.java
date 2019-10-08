@@ -24,7 +24,6 @@ public abstract class Unit implements MapElement {
     protected float attackTime;
     protected float walkTimer;
     protected float timePerFrame;
-    protected boolean aggressive;
 
     public Stats getStats() {
         return stats;
@@ -74,6 +73,7 @@ public abstract class Unit implements MapElement {
             int exp = BattleCalc.calculateExp(attacker, this);
             attacker.getStats().addExp(exp);
             gs.getInfoController().setup(attacker.getPosition().x, attacker.getPosition().y + 40, "exp +" + exp, Color.YELLOW);
+            gs.getPowerUpsController().setup(position.x, position.y, 1.2f, 2, stats.getLevel());
         }
     }
 
@@ -82,11 +82,9 @@ public abstract class Unit implements MapElement {
     }
 
     public void render(SpriteBatch batch, BitmapFont font) {
-        if (damageTimer > 0.0f)
+        if (damageTimer > 0.0f) {
             batch.setColor(1.0f, 1.0f - damageTimer, 1.0f - damageTimer, 1.0f);
-        else if (aggressive)
-            batch.setColor(1.0f, 0.45f, 0.0f, 1.0f);
-
+        }
         batch.draw(getCurrentTexture(), position.x - 40, position.y - 20);
         if (stats.getHp() < stats.getHpMax()) {
             batch.setColor(1.0f, 1.0f, 1.0f, 0.9f);

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -12,13 +13,15 @@ import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 
 public class Monster extends Unit implements Poolable {
+    public enum State {
+        HUNT, IDLE, WALK
+    }
+
+    private State state;
+    private Unit target;
     private String title;
     private float aiTimer;
     private float aiTimerTo;
-    private float aggrTimer;
-    private float aggrTimerTo;
-    private float aggrDirectionTimer;
-    private float aggrDirectionTimerTo;
 
     public String getTitle() {
         return title;
@@ -64,8 +67,6 @@ public class Monster extends Unit implements Poolable {
             this.position.set(x, y);
         }
         this.area.setPosition(position);
-        this.aggrTimerTo = 20.f;
-        this.aggrDirectionTimerTo = 0.2f;
     }
 
     @Override
@@ -77,48 +78,65 @@ public class Monster extends Unit implements Poolable {
             damageTimer -= dt;
         }
 
-        if (aggressive) {
-            aggrTimer += dt;
-            if (aggrTimer > aggrTimerTo) {
-                aggrTimer = 0.f;
-                aggressive = false;
-            }
-
-            aggrDirectionTimer += dt;
-            if (aggrDirectionTimer > aggrDirectionTimerTo) {
-                aggrDirectionTimer = 0.f;
-                direction = changeDirection();
-            }
-        } else if (aiTimer > aiTimerTo) {
+        if (aiTimer > aiTimerTo) {
+            state = State.values()[MathUtils.random(1, 2)]; // IDLE or WALK
             aiTimer = 0.0f;
             aiTimerTo = MathUtils.random(2.0f, 4.0f);
+            if (state == State.IDLE) {
+                aiTimerTo /= 4.0f;
+            }
             direction = Direction.values()[MathUtils.random(0, 3)];
         }
 
-        tmp.set(position).add(direction.getX() * stats.getSpeed() * dt, direction.getY() * stats.getSpeed() * dt);
-        if (gs.getMap().isCellPassable(tmp)) {
-            position.set(tmp);
-            walkTimer += dt;
-            area.setPosition(position);
+        if (state == State.HUNT) {
+            if (Math.abs(target.getPosition().x - this.position.x) > 30.0f) {
+                if (target.getPosition().x > this.position.x) {
+                    direction = Direction.RIGHT;
+                }
+                if (target.getPosition().x < this.position.x) {
+                    direction = Direction.LEFT;
+                }
+            }
+            if (Math.abs(target.getPosition().y - this.position.y) > 30.0f) {
+                if (target.getPosition().y > this.position.y) {
+                    direction = Direction.UP;
+                }
+                if (target.getPosition().y < this.position.y) {
+                    direction = Direction.DOWN;
+                }
+            }
         }
 
-        tryToAttack();
+        if (state != State.IDLE) {
+            tmp.set(position).add(direction.getX() * stats.getSpeed() * dt, direction.getY() * stats.getSpeed() * dt);
+            if (gs.getMap().isCellPassable(tmp)) {
+                position.set(tmp);
+                walkTimer += dt;
+                area.setPosition(position);
+            }
+
+            tryToAttack();
+        }
     }
 
-    private Direction changeDirection() {
-        Direction direction;
-        tmp.set(gs.getHero().getPosition());
-        float angle = tmp.sub(this.getPosition()).angle();
-        if (angle >= 45 && angle < 135)
-            direction = Direction.UP;
-        else if (angle >= 135 && angle < 225)
-            direction = Direction.LEFT;
-        else if (angle >= 225 && angle < 315)
-            direction = Direction.DOWN;
-        else
-            direction = Direction.RIGHT;
+    @Override
+    public void takeDamage(Unit attacker, int amount, Color color) {
+        super.takeDamage(attacker, amount, color);
+        if (MathUtils.random(0, 100) < 20) {
+            stateToHunt(attacker);
+        }
+    }
 
-        return direction;
+    public void stateToHunt(Unit target) {
+        this.state = State.HUNT;
+        this.target = target;
+        this.aiTimerTo = 15.0f;
+    }
+
+    @Override
+    public void render(SpriteBatch batch, BitmapFont font) {
+        super.render(batch, font);
+        font.draw(batch, state.name(), position.x + 20, position.y + 60);
     }
 
     public void tryToAttack() {
@@ -130,13 +148,5 @@ public class Monster extends Unit implements Poolable {
                 gs.getHero().takeDamage(this, BattleCalc.calculateDamage(this, gs.getHero()), Color.RED);
             }
         }
-    }
-
-    public boolean isAggressive() {
-        return aggressive;
-    }
-
-    public void setAggressive() {
-        this.aggressive = true;
     }
 }
