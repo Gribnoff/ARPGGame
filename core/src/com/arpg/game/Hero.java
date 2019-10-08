@@ -12,12 +12,16 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 public class Hero extends Unit {
-    private int score;
+    private Achievements achievements;
     private Inventory inventory;
     // private Sound soundSwordSwipe;
 
     public boolean isActive() {
         return stats.getHp() > 0;
+    }
+
+    public Achievements getAchievements() {
+        return achievements;
     }
 
     public Hero(GameScreen gameScreen) {
@@ -34,6 +38,7 @@ public class Hero extends Unit {
         this.stats = new Stats(1, 1, 1, 20, 1, 1, 10, 320.0f);
         this.weapon = new Weapon("Short Sword", 0.5f, 2, 6);
         // this.soundSwordSwipe=Gdx.audio.newSound(Gdx.files.internal("sounds/swordSwipe.wav"));
+        this.achievements = new Achievements();
     }
 
     @Override
@@ -90,6 +95,7 @@ public class Hero extends Unit {
                         int restored = stats.restoreHp(p.getPower());
                         gs.getInfoController().setup(position.x, position.y, "HP +" + restored, Color.GREEN);
                     }
+                    this.achievements.addPotionsUsed();
                 }
             }
             if (item.isWearable()) {
@@ -105,8 +111,9 @@ public class Hero extends Unit {
     }
 
     public void renderHUD(SpriteBatch batch, BitmapFont font) {
-        font.draw(batch, "SCORE: " + score + "\nLEVEL: " + stats.getLevel() + "\nHP: " + stats.getHp() + " / " + stats.getHpMax() + "\nCOINS: " + inventory.getCoins(), 20, 700);
+        font.draw(batch, "LEVEL: " + stats.getLevel() + "\nEXP: " + stats.getExp() + " / " + stats.getExpTo(stats.getLevel()) + "\nHP: " + stats.getHp() + " / " + stats.getHpMax() + "\nCOINS: " + inventory.getCoins(), 20, 700);
         inventory.render(batch, font);
+        achievements.render(batch, font);
     }
 
     public void consume(PowerUp p) {

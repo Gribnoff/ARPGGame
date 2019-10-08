@@ -45,6 +45,14 @@ public class Stats {
         return hpMax;
     }
 
+    public int getExp() {
+        return exp;
+    }
+
+    public int getExpTo(int currentLevel) {
+        return expTo[currentLevel - 1];
+    }
+
     public Stats() {
     }
 

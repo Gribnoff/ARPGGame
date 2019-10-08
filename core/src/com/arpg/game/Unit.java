@@ -72,6 +72,9 @@ public abstract class Unit implements MapElement {
         if (stats.getHp() <= 0) {
             int exp = BattleCalc.calculateExp(attacker, this);
             attacker.getStats().addExp(exp);
+            int score = BattleCalc.calculateScore(gs.getHero(), this);
+            gs.getHero().getAchievements().addScore(score);
+            gs.getHero().getAchievements().addMonstersKilled();
             gs.getInfoController().setup(attacker.getPosition().x, attacker.getPosition().y + 40, "exp +" + exp, Color.YELLOW);
             gs.getPowerUpsController().setup(position.x, position.y, 1.2f, 2, stats.getLevel());
         }

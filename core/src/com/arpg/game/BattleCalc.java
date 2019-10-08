@@ -21,4 +21,17 @@ public class BattleCalc {
         }
         return exp;
     }
+
+    public static int calculateScore(Hero hero, Unit target) {
+        int scoreAdd;
+        int lvlDiff = target.stats.getLevel() - hero.stats.getLevel();
+        if (lvlDiff <= -3)
+            scoreAdd = 25;
+        else if (lvlDiff <= 3)
+            scoreAdd = 100 + lvlDiff * 25;
+        else
+            scoreAdd = 100 + lvlDiff * 50;
+
+        return scoreAdd;
+    }
 }
