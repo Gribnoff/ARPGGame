@@ -16,6 +16,7 @@ public class Stats {
     private int hpMaxPL;
 
     private float speed;
+    private float stamina;
 
     private int hp;
     private int exp;
@@ -53,10 +54,18 @@ public class Stats {
         return expTo[currentLevel - 1];
     }
 
+    public float getStamina() {
+        return stamina;
+    }
+
+    public void setStamina(float stamina) {
+        this.stamina = stamina;
+    }
+
     public Stats() {
     }
 
-    public Stats(int level, int attBase, int defBase, int hpMaxBase, int attPL, int defPL, int hpMaxPL, float speed) {
+    public Stats(int level, int attBase, int defBase, int hpMaxBase, int attPL, int defPL, int hpMaxPL, float speed, float stamina) {
         this.level = level;
         this.attBase = attBase;
         this.defBase = defBase;
@@ -65,6 +74,7 @@ public class Stats {
         this.defPL = defPL;
         this.hpMaxPL = hpMaxPL;
         this.speed = speed;
+        this.stamina = stamina;
         this.calculate();
         this.fillHp();
     }
@@ -97,6 +107,14 @@ public class Stats {
             hp = hpMax;
         }
         return hp - hp0;
+    }
+
+    public void decreaseStamina(float amount) {
+        this.stamina -= amount;
+    }
+
+    public void increaseStamina(float amount) {
+        this.stamina += amount;
     }
 
     public void addExp(int amount) {

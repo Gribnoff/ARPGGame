@@ -35,7 +35,7 @@ public class Hero extends Unit {
             this.position.set(MathUtils.random(0, Map.MAP_SIZE_X_PX), MathUtils.random(0, Map.MAP_SIZE_Y_PX));
         } while (!gameScreen.getMap().isCellPassable(position));
         this.area.setPosition(position);
-        this.stats = new Stats(1, 1, 1, 20, 1, 1, 10, 320.0f);
+        this.stats = new Stats(1, 1, 1, 20, 1, 1, 10, 320.0f, 100.0f);
         this.weapon = new Weapon("Short Sword", 0.5f, 2, 6);
         // this.soundSwordSwipe=Gdx.audio.newSound(Gdx.files.internal("sounds/swordSwipe.wav"));
         this.achievements = new Achievements();
@@ -46,8 +46,10 @@ public class Hero extends Unit {
         float speedMod = 1.0f;
         attackTime += dt;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+        boolean running = false;
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && stats.getStamina() > 0) {
             speedMod = 1.2f;
+            running = true;
         }
 
         if (damageTimer > 0.0f) {
@@ -76,8 +78,18 @@ public class Hero extends Unit {
                 walkTimer += dt * speedMod;
                 position.set(tmp);
                 area.setPosition(position);
+                if (running)
+                    stats.decreaseStamina(dt);
+                else
+                    stats.increaseStamina(5 * dt);
             }
-        }
+        } else
+            stats.increaseStamina(10 * dt);
+
+        if (stats.getStamina() < 0)
+            stats.setStamina(0);
+        if (stats.getStamina() > 100)
+            stats.setStamina(100);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             inventory.selectPrev();
@@ -111,7 +123,12 @@ public class Hero extends Unit {
     }
 
     public void renderHUD(SpriteBatch batch, BitmapFont font) {
-        font.draw(batch, "LEVEL: " + stats.getLevel() + "\nEXP: " + stats.getExp() + " / " + stats.getExpTo(stats.getLevel()) + "\nHP: " + stats.getHp() + " / " + stats.getHpMax() + "\nCOINS: " + inventory.getCoins(), 20, 700);
+        font.draw(batch, "LEVEL: " + stats.getLevel() +
+                "\nEXP: " + stats.getExp() + " / " + stats.getExpTo(stats.getLevel()) +
+                "\nHP: " + stats.getHp() + " / " + stats.getHpMax() +
+                "\nSTAMINA: " + (int)stats.getStamina() + " / 100" +
+                "\nCOINS: " + inventory.getCoins(),
+                20, 700);
         inventory.render(batch, font);
         achievements.render(batch, font);
     }
@@ -144,7 +161,8 @@ public class Hero extends Unit {
     }
 
     public void attack() {
-        if (attackTime > weapon.getAttackPeriod()) {
+        if (attackTime > weapon.getAttackPeriod() && stats.getStamina() > 10) {
+            stats.decreaseStamina(10);
             attackTime = 0.0f;
             tmp.set(position).add(direction.getX() * 60, direction.getY() * 60);
             gs.getEffectController().setup(tmp.x, tmp.y, 0);

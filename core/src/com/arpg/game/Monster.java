@@ -52,7 +52,8 @@ public class Monster extends Unit implements Poolable {
                 Integer.parseInt(tokens[4].trim()),
                 Integer.parseInt(tokens[5].trim()),
                 Integer.parseInt(tokens[6].trim()),
-                Float.parseFloat(tokens[7].trim())
+                Float.parseFloat(tokens[7].trim()),
+                0
         );
         this.weapon = new Weapon("Bite", 0.8f, 2, 5);
     }
