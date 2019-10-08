@@ -88,6 +88,7 @@ public class Stats {
         this.defPL = stats.defPL;
         this.hpMaxPL = stats.hpMaxPL;
         this.speed = stats.speed;
+        this.stamina = stats.stamina;
         this.calculate();
         this.fillHp();
     }
@@ -115,6 +116,13 @@ public class Stats {
 
     public void increaseStamina(float amount) {
         this.stamina += amount;
+    }
+
+    public void checkStamina() {
+        if (stamina < 0)
+            stamina = 0;
+        if (stamina > 100)
+            stamina = 100;
     }
 
     public void addExp(int amount) {

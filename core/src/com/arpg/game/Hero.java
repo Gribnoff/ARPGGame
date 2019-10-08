@@ -86,10 +86,7 @@ public class Hero extends Unit {
         } else
             stats.increaseStamina(10 * dt);
 
-        if (stats.getStamina() < 0)
-            stats.setStamina(0);
-        if (stats.getStamina() > 100)
-            stats.setStamina(100);
+        stats.checkStamina();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             inventory.selectPrev();
