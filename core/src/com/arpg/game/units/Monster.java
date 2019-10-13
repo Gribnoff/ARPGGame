@@ -90,21 +90,53 @@ public class Monster extends Unit implements Poolable {
             direction = Direction.values()[MathUtils.random(0, 3)];
         }
 
-        if (state == State.HUNT && position.dst(target.getPosition()) > weapon.getAttackRange() * 1.2f) {
-            if (Math.abs(target.getPosition().x - this.position.x) > 30.0f) {
-                if (target.getPosition().x > this.position.x) {
-                    direction = Direction.RIGHT;
+        if (state == State.HUNT) {
+            if (weapon.getType() == Weapon.Type.MELEE && position.dst(target.getPosition()) > weapon.getAttackRange() * 1.2f) {
+                if (Math.abs(target.getPosition().x - this.position.x) > 30.0f) {
+                    if (target.getPosition().x > this.position.x)
+                        direction = Direction.RIGHT;
+                    if (target.getPosition().x < this.position.x)
+                        direction = Direction.LEFT;
+                } else if (Math.abs(target.getPosition().y - this.position.y) > 30.0f) {
+                    if (target.getPosition().y > this.position.y)
+                        direction = Direction.UP;
+                    if (target.getPosition().y < this.position.y)
+                        direction = Direction.DOWN;
                 }
-                if (target.getPosition().x < this.position.x) {
-                    direction = Direction.LEFT;
-                }
-            }
-            if (Math.abs(target.getPosition().y - this.position.y) > 30.0f) {
-                if (target.getPosition().y > this.position.y) {
-                    direction = Direction.UP;
-                }
-                if (target.getPosition().y < this.position.y) {
-                    direction = Direction.DOWN;
+            } else if (weapon.getType() == Weapon.Type.RANGED) {
+                if (Math.abs(target.getPosition().x - this.position.x) < 30.0f) {
+                    if (target.getPosition().y < this.position.y) {
+                        if (this.position.y - target.getPosition().y > weapon.getAttackRange() * 0.25)
+                            direction = Direction.DOWN;
+                        else
+                            direction = Direction.LOOK_DOWN;
+                    } else if (target.getPosition().y > this.position.y) {
+                        if (this.position.y - target.getPosition().y > weapon.getAttackRange() * 0.25)
+                            direction = Direction.UP;
+                        else
+                            direction = Direction.LOOK_UP;
+                    }
+                } else if (Math.abs(target.getPosition().y - this.position.y) < 30.0f) {
+                    if (target.getPosition().x < this.position.x) {
+                        if (this.position.x - target.getPosition().x > weapon.getAttackRange() * 0.25)
+                            direction = Direction.LEFT;
+                        else
+                            direction = Direction.LOOK_LEFT;
+                    } else if (target.getPosition().x > this.position.x) {
+                        if (this.position.x - target.getPosition().x > weapon.getAttackRange() * 0.25)
+                            direction = Direction.RIGHT;
+                        else
+                            direction = Direction.LOOK_RIGHT;
+                    }
+                } else if ((Math.abs(target.getPosition().x - this.position.x) > 30.0f) && Math.abs(target.getPosition().y - this.position.y) > 30.0f) {
+                    if (target.getPosition().x > this.position.x)
+                        direction = Direction.RIGHT;
+                    else if (target.getPosition().x < this.position.x)
+                        direction = Direction.LEFT;
+                    else if (target.getPosition().y > this.position.y)
+                        direction = Direction.UP;
+                    else if (target.getPosition().y < this.position.y)
+                        direction = Direction.DOWN;
                 }
             }
         }
