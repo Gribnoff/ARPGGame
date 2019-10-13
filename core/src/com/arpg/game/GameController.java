@@ -184,6 +184,12 @@ public class GameController {
 
             u1.getArea().setPosition(u1.getPosition());
             u2.getArea().setPosition(u2.getPosition());
+
+            if (!(u1 instanceof Hero || u2 instanceof Hero)
+                && MathUtils.random(0, 100) < 2) {
+                ((Monster) u1).stateToHunt(u2);
+                ((Monster) u2).stateToHunt(u1);
+            }
         }
     }
 
