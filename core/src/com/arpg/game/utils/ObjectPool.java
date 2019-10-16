@@ -31,6 +31,12 @@ public abstract class ObjectPool<T extends Poolable> {
         return temp;
     }
 
+    public void freeAll() {
+        for (int i = activeList.size() - 1; i >= 0; i--) {
+            free(i);
+        }
+    }
+
     public void checkPool() {
         for (int i = activeList.size() - 1; i >= 0; i--) {
             if (!activeList.get(i).isActive()) {

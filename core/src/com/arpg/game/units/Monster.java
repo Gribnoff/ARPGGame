@@ -20,6 +20,7 @@ public class Monster extends Unit implements Poolable {
     private Unit target;
     private String title;
     private float aiTimer;
+    private Unit damageTakedFrom;
 
     public String getTitle() {
         return title;
@@ -74,123 +75,133 @@ public class Monster extends Unit implements Poolable {
 
     @Override
     public void update(float dt) {
-        aiTimer -= dt;
+        stateMachine(dt);
         attackTime += dt;
 
         if (damageTimer > 0.0f) {
             damageTimer -= dt;
         }
 
-        if (aiTimer <= 0.0f) {
-            state = State.values()[MathUtils.random(1, 2)]; // IDLE or WALK
-            aiTimer = MathUtils.random(2.0f, 4.0f);
-            if (state == State.IDLE) {
-                aiTimer /= 4.0f;
-            }
-            direction = Direction.values()[MathUtils.random(0, 3)];
-        }
 
-        if (state == State.HUNT) {
-            if (weapon.getType() == Weapon.Type.MELEE && position.dst(target.getPosition()) > weapon.getAttackRange() * 1.2f) {
-                if (Math.abs(target.getPosition().x - this.position.x) > 30.0f) {
-                    if (target.getPosition().x > this.position.x)
-                        direction = Direction.RIGHT;
-                    if (target.getPosition().x < this.position.x)
-                        direction = Direction.LEFT;
-                } else if (Math.abs(target.getPosition().y - this.position.y) > 30.0f) {
-                    if (target.getPosition().y > this.position.y)
-                        direction = Direction.UP;
-                    if (target.getPosition().y < this.position.y)
-                        direction = Direction.DOWN;
+        if (state == State.HUNT && !canIHitTarget()) {
+            if (Math.abs(position.x - target.getPosition().x) < 20.0f) {
+                if (target.getPosition().y < position.y && direction != Direction.DOWN) {
+                    direction = Direction.DOWN;
                 }
-            } else if (weapon.getType() == Weapon.Type.RANGED) {
-                if (Math.abs(target.getPosition().x - this.position.x) < 30.0f) {
-                    if (target.getPosition().y < this.position.y) {
-                        if (this.position.y - target.getPosition().y > weapon.getAttackRange() * 0.25)
-                            direction = Direction.DOWN;
-                        else
-                            direction = Direction.LOOK_DOWN;
-                    } else if (target.getPosition().y > this.position.y) {
-                        if (this.position.y - target.getPosition().y > weapon.getAttackRange() * 0.25)
-                            direction = Direction.UP;
-                        else
-                            direction = Direction.LOOK_UP;
-                    }
-                } else if (Math.abs(target.getPosition().y - this.position.y) < 30.0f) {
-                    if (target.getPosition().x < this.position.x) {
-                        if (this.position.x - target.getPosition().x > weapon.getAttackRange() * 0.25)
-                            direction = Direction.LEFT;
-                        else
-                            direction = Direction.LOOK_LEFT;
-                    } else if (target.getPosition().x > this.position.x) {
-                        if (this.position.x - target.getPosition().x > weapon.getAttackRange() * 0.25)
-                            direction = Direction.RIGHT;
-                        else
-                            direction = Direction.LOOK_RIGHT;
-                    }
-                } else if ((Math.abs(target.getPosition().x - this.position.x) > 30.0f) && Math.abs(target.getPosition().y - this.position.y) > 30.0f) {
-                    if (target.getPosition().x > this.position.x)
-                        direction = Direction.RIGHT;
-                    else if (target.getPosition().x < this.position.x)
-                        direction = Direction.LEFT;
-                    else if (target.getPosition().y > this.position.y)
-                        direction = Direction.UP;
-                    else if (target.getPosition().y < this.position.y)
-                        direction = Direction.DOWN;
+                if (target.getPosition().y > position.y && direction != Direction.UP) {
+                    direction = Direction.UP;
+                }
+            }
+            if (Math.abs(position.y - target.getPosition().y) < 20.0f) {
+                if (target.getPosition().x < position.x && direction != Direction.LEFT) {
+                    direction = Direction.LEFT;
+                }
+                if (target.getPosition().x > position.x && direction != Direction.RIGHT) {
+                    direction = Direction.RIGHT;
                 }
             }
         }
 
-        if (state != State.IDLE) {
-            tmp.set(position).add(direction.getX() * stats.getSpeed() * dt, direction.getY() * stats.getSpeed() * dt);
-            if (gc.getMap().isCellPassable(tmp)) {
-                position.set(tmp);
-                walkTimer += dt;
-                area.setPosition(position);
-            }
+        tryToAttack();
 
-            tryToAttack();
+        if (shouldIMove()) {
+            moveForward(dt, 1.0f);
         }
     }
 
     @Override
     public void takeDamage(Unit attacker, int amount, Color color) {
         super.takeDamage(attacker, amount, color);
-        if (MathUtils.random(0, 100) < 20) {
-            stateToHunt(attacker);
+        damageTakedFrom = attacker;
+    }
+
+    public void render(SpriteBatch batch, BitmapFont font) {
+        if (damageTimer > 0.0f) {
+            batch.setColor(1.0f, 1.0f - damageTimer, 1.0f - damageTimer, 1.0f);
+        }
+        batch.draw(getCurrentTexture(), position.x - 40, position.y - 20);
+        if (stats.getHp() < stats.getHpMax()) {
+            batch.setColor(1.0f, 1.0f, 1.0f, 0.9f);
+            batch.draw(hpTexture, position.x - 40, position.y + 40, 80 * ((float) stats.getHp() / stats.getHpMax()), 12);
+        }
+        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        font.draw(batch, "" + stats.getLevel() + ". " + state.name(), position.x - 40, position.y + 52, 80,1,false);
+    }
+
+    public boolean shouldIMove() {
+        if (state == State.HUNT && canIHitTarget()) {
+            return false;
+        }
+        return true;
+    }
+
+    public void stateMachine(float dt) {
+        aiTimer -= dt;
+
+        if (aiTimer <= 0.0f) {
+            aiTimer = MathUtils.random(2.0f, 4.0f);
+            direction = Direction.values()[MathUtils.random(0, 3)];
+            state = State.values()[MathUtils.random(0, 1)];
+            if (state == State.IDLE) {
+                aiTimer /= 4.0f;
+            }
+        }
+
+        if (target != null && !target.isAlive()) {
+            target = null;
+        }
+
+        if (state == State.HUNT && target == null) {
+            state = State.WALK;
+            aiTimer = 1.0f;
+        }
+
+        if (damageTakedFrom != null && damageTakedFrom.isAlive()) {
+            if (target == null && MathUtils.random(0, 100) < 20) {
+                this.state = State.HUNT;
+                this.target = damageTakedFrom;
+                this.aiTimer = 30.0f;
+            }
+            damageTakedFrom = null;
         }
     }
 
-    public void stateToHunt(Unit target) {
-        this.state = State.HUNT;
-        this.target = target;
-        this.aiTimer = 15.0f;
-    }
-
-    @Override
-    public void render(SpriteBatch batch, BitmapFont font) {
-        super.render(batch, font);
-        font.draw(batch, state.name(), position.x + 20, position.y + 60);
+    public boolean canIHitTarget() {
+        if (target == null) {
+            return false;
+        }
+        if (position.dst(target.getPosition()) < weapon.getAttackRange()) {
+            if (direction == Direction.LEFT && position.x > target.getPosition().x ||
+                    direction == Direction.RIGHT && position.x < target.getPosition().x ||
+                    direction == Direction.UP && position.y < target.getPosition().y ||
+                    direction == Direction.DOWN && position.y > target.getPosition().y
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void tryToAttack() {
         if (attackTime > weapon.getAttackPeriod()) {
             attackTime = 0.0f;
 
-            if (weapon.getType() == Weapon.Type.MELEE && target != null) {
-                float dst = position.dst(target.getPosition());
-                if (dst <= weapon.getAttackRange()) {
-                    if (direction == Direction.LEFT && position.x > target.getPosition().x ||
-                            direction == Direction.RIGHT && position.x < target.getPosition().x ||
-                            direction == Direction.UP && position.y < target.getPosition().y ||
-                            direction == Direction.DOWN && position.y > target.getPosition().y) {
-                        gc.getEffectController().setup(target.getPosition().x, target.getPosition().y, 1);
-                        target.takeDamage(this, BattleCalc.calculateDamage(this, target), Color.RED);
-                    }
+            if (weapon.getType() == Weapon.Type.MELEE) {
+                if (canIHitTarget()) {
+                    gc.getEffectController().setup(target.getPosition().x, target.getPosition().y, 1);
+                    target.takeDamage(this, BattleCalc.calculateDamage(this, target, weapon.getDamage()), Color.WHITE);
                 }
             }
+
             if (weapon.getType() == Weapon.Type.RANGED) {
-                gc.getProjectileController().setup(this, position.x, position.y + 15, 400.0f, 0, weapon.getAttackRange(), direction.getAngle() + MathUtils.random(-10, 10));
+                if (target == null) {
+                    gc.getProjectileController().setup(this, position.x, position.y + 15, 400.0f, 0, weapon.getAttackRange(), direction.getAngle() + MathUtils.random(-5, 5), weapon.getDamage());
+                } else {
+                    if (canIHitTarget()) {
+                        float angle = (float) Math.toDegrees(Math.atan2(-position.y + target.getPosition().y, -position.x + target.getPosition().x));
+                        gc.getProjectileController().setup(this, position.x, position.y + 15, 400.0f, 0, weapon.getAttackRange(), angle + MathUtils.random(-5, 5), weapon.getDamage());
+                    }
+                }
             }
         }
     }
